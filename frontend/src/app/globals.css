@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fdfdfd;
+  --foreground: #1a1a1a;
+  --primary: #000000;
+  --secondary: #666666;
+  --accent: #2563eb;
+  --border: #e5e5e5;
+}
+
+@theme {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary {
+  @apply bg-black text-white px-6 py-2 rounded-lg font-medium transition-all hover:bg-gray-800 disabled:opacity-50;
+}
+
+.btn-secondary {
+  @apply bg-white text-black border border-gray-200 px-6 py-2 rounded-lg font-medium transition-all hover:bg-gray-50;
+}
