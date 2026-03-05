@@ -13,6 +13,8 @@ dotenv.config();
 
 const app = express();
 
+app.get('/ping', (req, res) => res.send('pong'));
+
 // BigInt serialization fix
 (BigInt.prototype as any).toJSON = function () {
     return this.toString();
