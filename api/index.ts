@@ -1,3 +1,3 @@
-import app from '../src/backend/app';
-
-export default app;
+export default function handler(req: any, res: any) {
+    res.status(200).json({ message: 'Minimal check' });
+}
