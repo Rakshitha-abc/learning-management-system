@@ -79,8 +79,8 @@ export async function POST(
     } catch (error: any) {
         console.error(`Auth Error (${action}):`, error);
         return NextResponse.json({
-            message: 'Authentication internal error',
-            details: error.message
+            message: `Auth Error: ${error.message}`,
+            details: error.stack
         }, { status: 500 });
     }
 }
