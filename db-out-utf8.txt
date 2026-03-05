@@ -1,0 +1,62 @@
+﻿[dotenv@17.3.1] injecting env (10) from .env -- tip: ΓÜÖ∩╕Å  override existing env vars with { override: true }
+Testing connection to: mysql-34b5d551-rakshitharashu60-1631.j.aivencloud.com
+SUCCESS: Connected to database.
+Schema of 'users' table:
+[
+  {
+    "Field": "id",
+    "Type": "bigint",
+    "Null": "NO",
+    "Key": "PRI",
+    "Default": null,
+    "Extra": "auto_increment"
+  },
+  {
+    "Field": "email",
+    "Type": "varchar(255)",
+    "Null": "NO",
+    "Key": "UNI",
+    "Default": null,
+    "Extra": ""
+  },
+  {
+    "Field": "password_hash",
+    "Type": "varchar(255)",
+    "Null": "NO",
+    "Key": "",
+    "Default": null,
+    "Extra": ""
+  },
+  {
+    "Field": "name",
+    "Type": "varchar(255)",
+    "Null": "NO",
+    "Key": "",
+    "Default": null,
+    "Extra": ""
+  },
+  {
+    "Field": "role",
+    "Type": "enum('student','instructor','admin')",
+    "Null": "YES",
+    "Key": "",
+    "Default": "student",
+    "Extra": ""
+  },
+  {
+    "Field": "created_at",
+    "Type": "timestamp",
+    "Null": "YES",
+    "Key": "",
+    "Default": "CURRENT_TIMESTAMP",
+    "Extra": "DEFAULT_GENERATED"
+  },
+  {
+    "Field": "updated_at",
+    "Type": "timestamp",
+    "Null": "YES",
+    "Key": "",
+    "Default": "CURRENT_TIMESTAMP",
+    "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+  }
+]

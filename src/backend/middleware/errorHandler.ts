@@ -8,6 +8,8 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
 
     res.status(status).json({
         status: 'error',
-        message
+        message: message,
+        details: err.message,
+        stack: process.env.NODE_ENV === 'production' ? undefined : err.stack
     });
 };
