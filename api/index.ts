@@ -1,4 +1,4 @@
-import app from '../src/backend/app';
-
-// Vercel Serverless Function entry point
+import express from 'express';
+const app = express();
+app.get('/api/ping', (req, res) => res.send('pong'));
 export default app;
