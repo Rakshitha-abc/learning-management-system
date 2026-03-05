@@ -9,7 +9,7 @@ export const register = async (email: string, password_raw: string, name: string
         [email, hash, name]
     );
 
-    const userId = result.insertId;
+    const userId = result.insertId.toString();
     const user = { id: userId, email, name, role: 'student' };
 
     const accessToken = generateAccessToken(user);
@@ -34,15 +34,16 @@ export const login = async (email: string, password_raw: string) => {
     const isValid = await comparePassword(password_raw, userRow.password_hash);
     if (!isValid) return null;
 
-    const user = { id: userRow.id, email: userRow.email, name: userRow.name, role: userRow.role };
+    const userId = userRow.id.toString();
+    const user = { id: userId, email: userRow.email, name: userRow.name, role: userRow.role };
     const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken({ id: userRow.id });
+    const refreshToken = generateRefreshToken({ id: userId });
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
     await pool.query(
         'INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)',
-        [userRow.id, refreshToken, expiresAt]
+        [userId, refreshToken, expiresAt]
     );
 
     return { user, accessToken, refreshToken };
