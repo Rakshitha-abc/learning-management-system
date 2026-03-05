@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as subjectService from '@/backend/modules/subjects/subject.service';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as subjectService from '@/backend/modules/subjects/subject.service';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
     try {
         const subjects = await subjectService.getAllPublishedSubjects();
