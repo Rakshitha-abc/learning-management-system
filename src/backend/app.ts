@@ -14,18 +14,18 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: process.env.CORS_ORIGIN || true, // true allows the request's origin
     credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/subjects', subjectRoutes);
-app.use('/api/videos', videoRoutes);
-app.use('/api/progress', progressRoutes);
-app.use('/api/health', healthRoutes);
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/subjects', '/subjects'], subjectRoutes);
+app.use(['/api/videos', '/videos'], videoRoutes);
+app.use(['/api/progress', '/progress'], progressRoutes);
+app.use(['/api/health', '/health'], healthRoutes);
 
 // Error Handling
 app.use(errorHandler);

@@ -218,6 +218,16 @@ async function initialize() {
         }
         console.log("Schema initialized.");
 
+        // Create Demo User
+        console.log("Seeding demo user...");
+        const { hashPassword } = await import('../utils/password');
+        const demoPasswordHash = await hashPassword('demo123');
+        await connection.query(
+            "INSERT IGNORE INTO users (email, password_hash, name, role) VALUES (?, ?, ?, ?)",
+            ['demo@gmail.com', demoPasswordHash, 'Demo User', 'student']
+        );
+        console.log("Demo user created (demo@gmail.com / demo123).");
+
         console.log("Seeding course data...");
         for (const data of courseData) {
             const slug = data.course.toLowerCase().replace(/ /g, '-');
