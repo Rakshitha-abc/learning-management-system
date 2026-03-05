@@ -1,4 +1,4 @@
-import express from 'express';
+const express = require('express');
 const app = express();
 app.get('/api/ping', (req, res) => res.send('pong'));
-export default app;
+module.exports = app;
