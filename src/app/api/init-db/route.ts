@@ -94,23 +94,40 @@ export async function GET() {
       await pool.query(statement);
     }
 
-    // Add demo subject if subjects is empty
-    const [rows]: any = await pool.query("SELECT COUNT(*) as count FROM subjects");
-    if (rows[0].count === 0) {
-      await pool.query(`
+    // Seed a complete course if empty
+    const [subjectCount]: any = await pool.query("SELECT COUNT(*) as count FROM subjects");
+    if (subjectCount[0].count === 0) {
+      // 1. Create Subject
+      const [subjectResult]: any = await pool.query(`
                 INSERT INTO subjects (title, slug, description, instructor_name, learning_outcomes, is_published) 
-                VALUES ('Java Programming', 'java', 'Java from Zero to Hero', 'Dr. James Gosling', 'OOP Concepts', TRUE)
+                VALUES ('Java programming Mastery', 'java-mastery', 'Learn Java from zero to hero with practical examples.', 'Dr. James Gosling', 'Understand OOP;Master Collections;Build robust apps', TRUE)
             `);
+      const subjectId = subjectResult.insertId;
+
+      // 2. Create Section
+      const [sectionResult]: any = await pool.query(`
+                INSERT INTO sections (subject_id, title, order_index) 
+                VALUES (?, 'Introduction to Java', 1)
+            `, [subjectId]);
+      const sectionId = sectionResult.insertId;
+
+      // 3. Create Videos
+      await pool.query(`
+                INSERT INTO videos (section_id, title, youtube_url, order_index, description) 
+                VALUES 
+                (?, 'What is Java?', 'https://www.youtube.com/watch?v=eIrMbvPZqh4', 1, 'Introduction to the Java ecosystem.'),
+                (?, 'Installing JDK', 'https://www.youtube.com/watch?v=eIrMbvPZqh4', 2, 'Setting up your development environment.')
+            `, [sectionId, sectionId]);
     }
 
     return NextResponse.json({
       status: 'ok',
-      message: 'Database schema initialized! Your database is now ready for users and courses.'
+      message: 'Database schema and sample course initialized! Go to the home page to see your courses.'
     });
   } catch (error: any) {
     return NextResponse.json({
       status: 'error',
-      message: 'Schema initialization failed',
+      message: 'Initialization failed',
       details: error.message
     }, { status: 500 });
   }
