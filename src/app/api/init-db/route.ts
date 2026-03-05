@@ -74,33 +74,44 @@ CREATE TABLE IF NOT EXISTS video_progress (
   FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE,
   UNIQUE INDEX idx_user_video (user_id, video_id)
 );
+
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  token_hash VARCHAR(500) NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  revoked_at TIMESTAMP NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_user_token (user_id, token_hash)
+);
 `;
 
 export async function GET() {
-    try {
-        const statements = schema.split(';').filter(s => s.trim());
-        for (const statement of statements) {
-            await pool.query(statement);
-        }
+  try {
+    const statements = schema.split(';').filter(s => s.trim());
+    for (const statement of statements) {
+      await pool.query(statement);
+    }
 
-        // Add demo subject if subjects is empty
-        const [rows]: any = await pool.query("SELECT COUNT(*) as count FROM subjects");
-        if (rows[0].count === 0) {
-            await pool.query(`
+    // Add demo subject if subjects is empty
+    const [rows]: any = await pool.query("SELECT COUNT(*) as count FROM subjects");
+    if (rows[0].count === 0) {
+      await pool.query(`
                 INSERT INTO subjects (title, slug, description, instructor_name, learning_outcomes, is_published) 
                 VALUES ('Java Programming', 'java', 'Java from Zero to Hero', 'Dr. James Gosling', 'OOP Concepts', TRUE)
             `);
-        }
-
-        return NextResponse.json({
-            status: 'ok',
-            message: 'Database schema initialized! Your database is now ready for users and courses.'
-        });
-    } catch (error: any) {
-        return NextResponse.json({
-            status: 'error',
-            message: 'Schema initialization failed',
-            details: error.message
-        }, { status: 500 });
     }
+
+    return NextResponse.json({
+      status: 'ok',
+      message: 'Database schema initialized! Your database is now ready for users and courses.'
+    });
+  } catch (error: any) {
+    return NextResponse.json({
+      status: 'error',
+      message: 'Schema initialization failed',
+      details: error.message
+    }, { status: 500 });
+  }
 }
