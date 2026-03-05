@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import apiClient from '@/lib/apiClient';
 import VideoPlayer from '@/components/Video/VideoPlayer';
-import { ChevronLeft, ChevronRight, CheckCircle, Info, ArrowLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckCircle, Info, ArrowLeft, Lock } from 'lucide-react';
 import Link from 'next/link';
 
 export default function VideoViewPage() {
@@ -14,31 +14,37 @@ export default function VideoViewPage() {
     const [progress, setProgress] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         if (videoId) {
             setLoading(true);
             Promise.all([
                 apiClient.get(`/videos/${videoId}`),
-                apiClient.get(`/progress/videos/${videoId}`)
+                apiClient.get(`/progress?videoId=${videoId}`)
             ]).then(([videoRes, progressRes]) => {
                 setVideo(videoRes.data);
                 setProgress(progressRes.data);
             }).catch(err => {
-                console.error(err);
+                console.error("Video API Error:", err);
+                const msg = err.response?.data?.message || err.message;
+                setError(`Failed to load video: ${msg} (Status: ${err.response?.status})`);
                 if (err.response?.status === 401) router.push('/auth/login');
             }).finally(() => setLoading(false));
         }
     }, [videoId, router]);
 
     const handleProgressUpdate = (time: number) => {
-        apiClient.post(`/progress/videos/${videoId}`, {
+        apiClient.post(`/progress`, {
+            video_id: videoId,
             last_position_seconds: Math.floor(time),
             is_completed: false
         }).catch(e => console.error('Save progress failed', e));
     };
 
     const handleVideoCompleted = () => {
-        apiClient.post(`/progress/videos/${videoId}`, {
+        apiClient.post(`/progress`, {
+            video_id: videoId,
             last_position_seconds: video.duration_seconds || 0,
             is_completed: true
         }).then(() => {
@@ -59,6 +65,7 @@ export default function VideoViewPage() {
         </div>
     );
 
+    if (error) return <div className="p-12 text-red-500 font-bold">{error}</div>;
     if (!video) return <div className="p-12">Video not found.</div>;
 
     if (video.locked) {
@@ -147,5 +154,3 @@ export default function VideoViewPage() {
         </div>
     );
 }
-
-import { Lock } from 'lucide-react';

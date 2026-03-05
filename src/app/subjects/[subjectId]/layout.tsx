@@ -16,17 +16,16 @@ export default function SubjectLayout({ children }: { children: React.ReactNode 
             const fetchData = async () => {
                 try {
                     // Try fetching all data, but allow progress to fail for guests
-                    const [treeRes, progressRes, detailsRes] = await Promise.allSettled([
-                        apiClient.get(`/subjects/${subjectId}/tree`),
-                        apiClient.get(`/progress/subjects/${subjectId}`),
-                        apiClient.get(`/progress/subjects/${subjectId}/details`)
+                    const [treeRes, progressRes] = await Promise.allSettled([
+                        apiClient.get(`/subjects/${subjectId}`),
+                        apiClient.get(`/progress?subjectId=${subjectId}`)
                     ]);
 
                     if (treeRes.status === 'rejected') throw treeRes.reason;
 
                     const treeData = treeRes.value.data;
                     const progressData = progressRes.status === 'fulfilled' ? progressRes.value.data : { percent: 0, completed: 0, total: 0 };
-                    const detailsData = detailsRes.status === 'fulfilled' ? detailsRes.value.data : [];
+                    const detailsData = progressData.details || []; // Extract details from combined progressData object
 
                     // Map progress details to tree structure
                     const progressMap = new Map(detailsData.map((d: any) => [d.id, d.is_completed]));
@@ -39,8 +38,8 @@ export default function SubjectLayout({ children }: { children: React.ReactNode 
                             videos: section.videos.map((video: any) => {
                                 const is_completed = !!progressMap.get(video.id);
                                 const is_locked = !lastCompleted;
-                                // If guest (details failed), we don't lock everything, let them preview
-                                const finalLocked = detailsRes.status === 'fulfilled' ? is_locked : false;
+                                // If guest (progress failed), we don't lock everything, let them preview
+                                const finalLocked = progressRes.status === 'fulfilled' ? is_locked : false;
                                 lastCompleted = is_completed;
                                 return { ...video, is_completed, is_locked: finalLocked };
                             })

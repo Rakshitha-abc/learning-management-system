@@ -12,8 +12,9 @@ export async function GET(request: NextRequest) {
         const videoId = searchParams.get('videoId');
 
         if (subjectId) {
-            const progress = await progressService.getSubjectProgressDetails(user.id, parseInt(subjectId));
-            return NextResponse.json(progress);
+            const progress = await progressService.getSubjectProgress(user.id, parseInt(subjectId));
+            const details = await progressService.getSubjectProgressDetails(user.id, parseInt(subjectId));
+            return NextResponse.json({ ...progress, details });
         }
 
         if (videoId) {
