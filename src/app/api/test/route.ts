@@ -2,38 +2,37 @@ import { NextResponse } from 'next/server';
 import pool from '@/backend/config/db';
 
 export async function GET() {
-    console.log("Diagnostic Route /api/test triggered");
-
-    // Check missing environment variables
-    const requiredVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME', 'JWT_ACCESS_SECRET'];
-    const missingVars = requiredVars.filter(v => !process.env[v]);
-
-    if (missingVars.length > 0) {
-        return NextResponse.json({
-            status: 'error',
-            message: 'Your Vercel deployment is missing environment variables!',
-            missing_variables: missingVars,
-            action: 'Please add these keys to your Vercel Project Settings > Environment Variables'
-        }, { status: 500 });
-    }
-
     try {
-        console.log("Attempting to test DB connection...");
-        const [rows]: any = await pool.query("SELECT 1 as connection_test");
+        // 1. Test basic connection
+        await pool.query("SELECT 1");
+
+        // 2. Check if tables exist
+        const [tables]: any = await pool.query("SHOW TABLES");
+        const tableNames = tables.map((t: any) => Object.values(t)[0]);
+
+        const requiredTables = ['users', 'subjects', 'sections', 'videos'];
+        const missingTables = requiredTables.filter(t => !tableNames.includes(t));
+
+        if (missingTables.length > 0) {
+            return NextResponse.json({
+                status: 'error',
+                message: 'Database connection ok, but tables are missing!',
+                found_tables: tableNames,
+                missing_tables: missingTables,
+                solution: 'You need to run the database initialization script to create the tables.'
+            }, { status: 500 });
+        }
 
         return NextResponse.json({
             status: 'ok',
-            message: 'Perfect! Both API and Database are connected correctly.',
-            db_connection: 'Verified',
-            timestamp: new Date().toISOString()
+            message: 'All systems go! Database is connected and tables exist.',
+            tables: tableNames
         });
     } catch (error: any) {
-        console.error("Diagnostic DB error:", error);
         return NextResponse.json({
             status: 'error',
-            message: 'API is working, but could not connect to the database.',
-            error_details: error.message,
-            tip: 'Ensure your database is active and allows connections from any IP if necessary.'
+            message: 'Database check failed',
+            details: error.message
         }, { status: 500 });
     }
 }
