@@ -13,6 +13,11 @@ dotenv.config();
 
 const app = express();
 
+// BigInt serialization fix
+(BigInt.prototype as any).toJSON = function () {
+    return this.toString();
+};
+
 app.use(cors({
     origin: process.env.CORS_ORIGIN || true, // true allows the request's origin
     credentials: true
